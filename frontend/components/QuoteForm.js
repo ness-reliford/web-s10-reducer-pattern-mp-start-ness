@@ -1,34 +1,56 @@
-import React from 'react' // 👈 you'll need the reducer hook
+import React, { useReducer } from 'react' 
 
-// 👇 these are the types of actions that can change state
 const CHANGE_INPUT = 'CHANGE_INPUT'
 const RESET_FORM = 'RESET_FORM'
 
-// 👇 create your initial state object here
+const initialState = {
+  authorName: '',
+  quoteText: ''
+}
 
-// 👇 create your reducer function here
+const reducer = (state, action) => {
+  switch(action.type){
 
-export default function TodoForm({ createQuote = () => { } }) {
-  // 👇 use the reducer hook to spin up state and dispatch
+    case CHANGE_INPUT:{
+      const {name, value} = action.payload
+      return{
+        ...state, [name]: value
+      }}
+    case RESET_FORM:
+      return {
+        authorName: '', quoteText: ''
+      }
+    default:
+      return state
+  }
+}
+export default function TodoForm({ createQuote }) {
+  
+  const [state, dispatch] = useReducer(reducer, initialState)
 
-  const onChange = () => {
-    // 👇 implement
+  const onChange = ({target: {name, value}}) => {
+    
+    dispatch({type: CHANGE_INPUT, payload: {name, value}})
   }
   const resetForm = () => {
-    // 👇 implement
+    
+    dispatch({type: RESET_FORM})
   }
-  const onNewQuote = () => {
-    // 👇 implement
+  const onNewQuote = (evt) => {
+   
+    evt.preventDefault()
+    const {authorName, quoteText} = state
+    createQuote({authorName, quoteText})
     resetForm()
   }
 
-  // 👇 some props are missing in the JSX below:
   return (
     <form id="quoteForm" onSubmit={onNewQuote}>
       <h3>New Quote Form</h3>
       <label><span>Author:</span>
         <input
           type='text'
+          value={state.authorName}
           name='authorName'
           placeholder='type author name'
           onChange={onChange}
@@ -39,6 +61,7 @@ export default function TodoForm({ createQuote = () => { } }) {
           type='text'
           name='quoteText'
           placeholder='type quote'
+          value={state.quoteText}
           onChange={onChange}
         />
       </label>
